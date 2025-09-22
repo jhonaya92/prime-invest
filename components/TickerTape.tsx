@@ -6,14 +6,15 @@ export default function TickerTape() {
   const inited = useRef(false);
 
   useEffect(() => {
-    if (inited.current) return;         // evita duplicar no dev
+    if (inited.current) return; // evita duplicar no dev
     inited.current = true;
 
     if (!ref.current) return;
-    ref.current.innerHTML = "";          // limpa antes de injetar
+    ref.current.innerHTML = ""; // limpa antes de injetar
 
     const s = document.createElement("script");
-    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
+    s.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-ticker-tape.js";
     s.async = true;
     s.innerHTML = JSON.stringify({
       symbols: [
@@ -22,7 +23,7 @@ export default function TickerTape() {
         { proName: "BMFBOVESPA:ITUB4", title: "ITUB4" },
         { proName: "BMFBOVESPA:BBDC4", title: "BBDC4" },
         { proName: "BMFBOVESPA:BBAS3", title: "BBAS3" },
-        { proName: "BMFBOVESPA:PRIO3", title: "PRIO3" }
+        { proName: "BMFBOVESPA:PRIO3", title: "PRIO3" },
       ],
       showSymbolLogo: true,
       isTransparent: true,
@@ -36,8 +37,15 @@ export default function TickerTape() {
     ref.current.appendChild(wrap);
     ref.current.appendChild(s);
 
-    return () => { if (ref.current) ref.current.innerHTML = ""; };
+    return () => {
+      if (ref.current) ref.current.innerHTML = "";
+    };
   }, []);
 
-  return <div ref={ref} className="glass rounded-2xl px-2 py-1 mb-4 overflow-hidden" />;
+  return (
+    <div
+      ref={ref}
+      className="glass rounded-2xl px-2 py-1 mb-4 overflow-hidden"
+    />
+  );
 }
