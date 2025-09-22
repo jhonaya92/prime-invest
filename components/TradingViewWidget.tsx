@@ -21,7 +21,8 @@ export default function TradingViewWidget({ symbol, height = 520 }: Props) {
 
     // script do Advanced Chart
     const s = document.createElement("script");
-    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    s.src =
+      "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
     s.async = true;
     s.innerHTML = JSON.stringify({
       width: "100%",
@@ -37,15 +38,23 @@ export default function TradingViewWidget({ symbol, height = 520 }: Props) {
       hide_legend: false,
       save_image: false,
       calendar: false,
-      withdateranges: true
+      withdateranges: true,
     });
 
     ref.current.appendChild(container);
     ref.current.appendChild(s);
 
-    return () => { if (ref.current) ref.current.innerHTML = ""; };
+    return () => {
+      if (ref.current) ref.current.innerHTML = "";
+    };
   }, [symbol, height]);
 
   // wrapper com altura fixa para o widget respeitar
-  return <div ref={ref} style={{ height }} className="rounded-2xl overflow-hidden border border-white/10" />;
+  return (
+    <div
+      ref={ref}
+      style={{ height }}
+      className="rounded-2xl overflow-hidden border border-white/10"
+    />
+  );
 }
