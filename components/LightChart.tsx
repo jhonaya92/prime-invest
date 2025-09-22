@@ -1,19 +1,17 @@
 ﻿"use client";
 import { useEffect, useRef, useState } from "react";
-import { createChart, ColorType, ISeriesApi, UTCTimestamp } from "lightweight-charts";
 
 type Props = { symbol: string; height?: number };
 
-function normalizeTicker(input: string) {
-  const s = input.includes(":") ? input.split(":")[1] : input;
-  return s.trim().toUpperCase();
-}
-function genMockCandles(): { candles: any[]; volumes: any[] } {
+type ChartApi = any;
+type SeriesApi = any;
+
+function genMock() {
   const outC: any[] = []; const outV: any[] = [];
   let price = 30 + Math.random() * 20;
   const now = Math.floor(Date.now() / 1000), day = 86400;
   for (let i = 119; i >= 0; i--) {
-    const time = (now - i * day) as UTCTimestamp;
+    const time = (now - i * day);
     const drift = (Math.random() - 0.5) * 1.2;
     const open = price, close = Math.max(1, open + drift);
     const high = Math.max(open, close) + Math.random() * 0.6;
@@ -28,84 +26,97 @@ function genMockCandles(): { candles: any[]; volumes: any[] } {
 
 export default function LightChart({ symbol, height = 520 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const chartRef = useRef<ReturnType<typeof createChart>>();
-  const candleRef = useRef<ISeriesApi<"Candlestick">>();
-  const volumeRef = useRef<ISeriesApi<"Histogram">>();
+  const chartRef = useRef<ChartApi | null>(null);
+  const candleRef = useRef<SeriesApi | null>(null);
+  const volumeRef = useRef<SeriesApi | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // init do gráfico com import dinâmico (garante métodos corretos)
   useEffect(() => {
     if (!containerRef.current) return;
-    const chart = createChart(containerRef.current, {
-      height,
-      layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: "#cbd5e1" },
-      grid: { vertLines: { color: "rgba(255,255,255,0.06)" }, horzLines: { color: "rgba(255,255,255,0.06)" } },
-      crosshair: { mode: 1 },
-      rightPriceScale: { borderColor: "rgba(255,255,255,0.08)" },
-      timeScale: { borderColor: "rgba(255,255,255,0.08)" },
+    let dispose = () => {};
+    (async () => {
+      const L = await import("lightweight-charts"); // <- AQUI o pulo do gato
+      const { createChart, ColorType } = L as any;
+
+      const chart: ChartApi = createChart(containerRef.current!, {
+        height,
+        layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: "#cbd5e1" },
+        grid: { vertLines: { color: "rgba(255,255,255,0.06)" }, horzLines: { color: "rgba(255,255,255,0.06)" } },
+        crosshair: { mode: 1 },
+        rightPriceScale: { borderColor: "rgba(255,255,255,0.08)" },
+        timeScale: { borderColor: "rgba(255,255,255,0.08)" },
+      });
+      console.log("[LightChart] chart criado. Tem addCandlestickSeries?", typeof (chart as any).addCandlestickSeries);
+
+      if (typeof (chart as any).addCandlestickSeries !== "function") {
+        throw new Error("API da lib não carregou corretamente.");
+      }
+
+      chartRef.current = chart;
+      candleRef.current = chart.addCandlestickSeries({
+        upColor: "#22c55e", downColor: "#ef4444", borderVisible: false,
+        wickUpColor: "#22c55e", wickDownColor: "#ef4444",
+      });
+      volumeRef.current = chart.addHistogramSeries({ priceFormat: { type: "volume" }, priceScaleId: "", base: 0 });
+
+      const applyWidth = () => chart.applyOptions({ width: Math.max(300, containerRef.current!.clientWidth) });
+      applyWidth();
+      const ro = new ResizeObserver(es => chart.applyOptions({ width: Math.max(300, Math.floor(es[0].contentRect.width)) }));
+      ro.observe(containerRef.current!);
+      const onWin = () => applyWidth();
+      window.addEventListener("resize", onWin);
+
+      dispose = () => { ro.disconnect(); window.removeEventListener("resize", onWin); chart.remove(); };
+    })().catch((e) => {
+      console.error("[LightChart] init error:", e);
+      setError("Falha ao iniciar o gráfico — usando amostra local.");
+      setLoading(false);
     });
-    chartRef.current = chart;
 
-    const candle = chart.addCandlestickSeries({ upColor:"#22c55e", downColor:"#ef4444", borderVisible:false, wickUpColor:"#22c55e", wickDownColor:"#ef4444" });
-    candleRef.current = candle;
-    const volume = chart.addHistogramSeries({ priceFormat: { type: "volume" }, priceScaleId: "", base: 0 });
-    volumeRef.current = volume;
-
-    const applyWidth = () => chart.applyOptions({ width: Math.max(300, containerRef.current?.clientWidth || 0) });
-    applyWidth();
-
-    const ro = new ResizeObserver((es) => {
-      const w = Math.max(300, Math.floor(es[0].contentRect.width));
-      chart.applyOptions({ width: w });
-    });
-    ro.observe(containerRef.current);
-
-    const onWin = () => applyWidth();
-    window.addEventListener("resize", onWin);
-
-    return () => { ro.disconnect(); window.removeEventListener("resize", onWin); chart.remove(); };
+    return () => dispose();
   }, [height]);
 
+  // carrega dados (ou mock) quando o gráfico já existe
   useEffect(() => {
     let cancelled = false;
-    async function load() {
+    (async () => {
+      if (!chartRef.current || !candleRef.current || !volumeRef.current) return;
       setLoading(true); setError(null);
       try {
-        const t = normalizeTicker(symbol);
+        const t = symbol.includes(":") ? symbol.split(":")[1].toUpperCase() : symbol.toUpperCase();
         const res = await fetch(`/api/quote/${encodeURIComponent(t)}`);
-        if (!res.ok) throw new Error("Falha ao buscar dados remotos");
-        const data = await res.json();
-        const item = data?.results?.[0];
-        const hist = item?.historicalDataPrice || [];
-
-        const toSec = (d:any)=> typeof d==="number" ? (d>20000000000?Math.floor(d/1000):d) : Math.floor(new Date(d).getTime()/1000);
+        const ok = res.ok;
+        const data = ok ? await res.json() : null;
+        const hist = data?.results?.[0]?.historicalDataPrice || [];
 
         let candles:any[] = [], volumes:any[] = [];
         if (Array.isArray(hist) && hist.length) {
-          candles = hist.map((h:any)=>({ time: toSec(h.date) as UTCTimestamp, open:+h.open, high:+h.high, low:+h.low, close:+h.close }))
-                        .sort((a,b)=>(a.time as number)-(b.time as number));
-          volumes = hist.map((h:any)=>({ time: toSec(h.date) as UTCTimestamp, value:+h.volume||0, color:(+h.close>=+h.open)?"rgba(34,197,94,0.35)":"rgba(239,68,68,0.35)" }))
-                        .sort((a,b)=>(a.time as number)-(b.time as number));
+          const toSec = (d:any)=> typeof d==="number" ? (d>20000000000?Math.floor(d/1000):d) : Math.floor(new Date(d).getTime()/1000);
+          candles = hist.map((h:any)=>({ time: toSec(h.date), open:+h.open, high:+h.high, low:+h.low, close:+h.close }))
+                        .sort((a,b)=>a.time-b.time);
+          volumes = hist.map((h:any)=>({ time: toSec(h.date), value:+h.volume||0, color:(+h.close>=+h.open)?"rgba(34,197,94,0.35)":"rgba(239,68,68,0.35)" }))
+                        .sort((a,b)=>a.time-b.time);
         } else {
-          ({ candles, volumes } = genMockCandles());
+          ({ candles, volumes } = genMock());
           setError("Dados remotos indisponíveis — amostra local.");
         }
 
         if (cancelled) return;
-        candleRef.current?.setData(candles);
-        volumeRef.current?.setData(volumes);
-        chartRef.current?.timeScale().fitContent();
+        candleRef.current.setData(candles);
+        volumeRef.current.setData(volumes);
+        chartRef.current.timeScale().fitContent();
       } catch (e:any) {
         if (!cancelled) {
-          const { candles, volumes } = genMockCandles();
-          candleRef.current?.setData(candles);
-          volumeRef.current?.setData(volumes);
-          chartRef.current?.timeScale().fitContent();
+          const m = genMock();
+          candleRef.current!.setData(m.candles);
+          volumeRef.current!.setData(m.volumes);
+          chartRef.current!.timeScale().fitContent();
           setError(e?.message || "Erro — amostra local.");
         }
       } finally { if (!cancelled) setLoading(false); }
-    }
-    load();
+    })();
     return () => { cancelled = true; };
   }, [symbol]);
 

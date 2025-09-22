@@ -23,7 +23,8 @@ export default function Header() {
 
       <nav className="hidden md:flex items-center gap-2">
         {NAV.map((n) => {
-          const active = path === n.href || (n.href !== "/" && path?.startsWith(n.href));
+          const active =
+            path === n.href || (n.href !== "/" && path?.startsWith(n.href));
           return (
             <Link
               key={n.href}
@@ -36,7 +37,9 @@ export default function Header() {
         })}
       </nav>
 
-      <div className="ml-auto w-72 max-w-[45vw]"><SearchBar /></div>
+      <div className="ml-auto w-72 max-w-[45vw]">
+        <SearchBar />
+      </div>
     </header>
   );
 }

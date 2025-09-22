@@ -12,11 +12,13 @@ export default function Page() {
     <main className="space-y-4">
       <section className="glass rounded-2xl p-6">
         <h1 className="text-2xl font-bold">Notícias</h1>
-        <p className="text-gray-400 text-sm">Atualizações mais recentes (mock).</p>
+        <p className="text-gray-400 text-sm">
+          Atualizações mais recentes (mock).
+        </p>
       </section>
       <section className="card">
         <ul className="space-y-4">
-          {news.map((n, i)=>(
+          {news.map((n, i) => (
             <li key={i}>
               <div className="text-base">{n.title}</div>
               <div className="text-xs text-gray-400">{n.time}</div>

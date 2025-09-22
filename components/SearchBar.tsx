@@ -20,7 +20,9 @@ export default function SearchBar() {
   const results = useMemo(() => {
     const s = normalizeInput(q);
     if (!s) return [];
-    return TICKERS.filter(t => t.symbol.includes(s) || t.name.toUpperCase().includes(s)).slice(0, 6);
+    return TICKERS.filter(
+      (t) => t.symbol.includes(s) || t.name.toUpperCase().includes(s),
+    ).slice(0, 6);
   }, [q]);
 
   function go(sym: string) {
@@ -39,24 +41,26 @@ export default function SearchBar() {
     <div className="relative">
       <input
         value={q}
-        onChange={(e)=>setQ(e.target.value)}
+        onChange={(e) => setQ(e.target.value)}
         onKeyDown={onKey}
         placeholder="Buscar ação (ex: PETR4, VALE3)"
         className="w-full bg-white/5 border border-white/10 rounded-xl px-3 py-2 text-sm outline-none focus:border-white/20"
       />
       {q && results.length > 0 && (
         <div className="absolute z-20 mt-1 w-full bg-black/80 backdrop-blur rounded-xl border border-white/10 p-1">
-          {results.map((r)=>(
+          {results.map((r) => (
             <button
               key={r.symbol}
-              onClick={()=>go(r.symbol)}
+              onClick={() => go(r.symbol)}
               className="w-full text-left px-3 py-2 rounded-lg hover:bg-white/10 text-sm"
             >
               <span className="font-semibold">{r.symbol.split(":")[1]}</span>
               <span className="text-gray-400"> — {r.name}</span>
             </button>
           ))}
-          <div className="px-3 py-1 text-[11px] text-gray-400">Pressione Enter para buscar “{q.toUpperCase()}”.</div>
+          <div className="px-3 py-1 text-[11px] text-gray-400">
+            Pressione Enter para buscar “{q.toUpperCase()}”.
+          </div>
         </div>
       )}
     </div>

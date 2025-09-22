@@ -1,5 +1,10 @@
 ﻿export default function Page() {
-  const perks = ["Sala ao vivo semanal", "Alertas por e-mail", "Planilhas e carteiras", "Comunidade privada (Discord)"];
+  const perks = [
+    "Sala ao vivo semanal",
+    "Alertas por e-mail",
+    "Planilhas e carteiras",
+    "Comunidade privada (Discord)",
+  ];
   return (
     <main className="space-y-4">
       <section className="glass rounded-2xl p-6">
@@ -8,7 +13,11 @@
       </section>
       <section className="card">
         <ul className="grid sm:grid-cols-2 gap-3 text-sm">
-          {perks.map((p,i)=> (<li key={i} className="bg-white/5 rounded-xl px-3 py-2">{p}</li>))}
+          {perks.map((p, i) => (
+            <li key={i} className="bg-white/5 rounded-xl px-3 py-2">
+              {p}
+            </li>
+          ))}
         </ul>
       </section>
     </main>

@@ -19,5 +19,5 @@ export const TICKERS: TItem[] = [
   { symbol: "BMFBOVESPA:PETR3", name: "Petrobras ON" },
   { symbol: "BMFBOVESPA:ITSA4", name: "Itaúsa PN" },
   { symbol: "BMFBOVESPA:RAIL3", name: "Rumo ON" },
-  { symbol: "BMFBOVESPA:B3SA3", name: "B3 ON" }
+  { symbol: "BMFBOVESPA:B3SA3", name: "B3 ON" },
 ];
