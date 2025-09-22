@@ -1,0 +1,23 @@
+﻿export type TItem = { symbol: string; name: string };
+export const TICKERS: TItem[] = [
+  { symbol: "BMFBOVESPA:PETR4", name: "Petrobras PN" },
+  { symbol: "BMFBOVESPA:VALE3", name: "Vale ON" },
+  { symbol: "BMFBOVESPA:ITUB4", name: "Itaú Unibanco PN" },
+  { symbol: "BMFBOVESPA:BBDC4", name: "Bradesco PN" },
+  { symbol: "BMFBOVESPA:BBAS3", name: "Banco do Brasil ON" },
+  { symbol: "BMFBOVESPA:PRIO3", name: "PRIO ON" },
+  { symbol: "BMFBOVESPA:ABEV3", name: "Ambev ON" },
+  { symbol: "BMFBOVESPA:LREN3", name: "Renner ON" },
+  { symbol: "BMFBOVESPA:WEGE3", name: "WEG ON" },
+  { symbol: "BMFBOVESPA:MGLU3", name: "Magazine Luiza ON" },
+  { symbol: "BMFBOVESPA:GGBR4", name: "Gerdau PN" },
+  { symbol: "BMFBOVESPA:SUZB3", name: "Suzano ON" },
+  { symbol: "BMFBOVESPA:TAEE11", name: "Taesa Unit" },
+  { symbol: "BMFBOVESPA:KLBN11", name: "Klabin Unit" },
+  { symbol: "BMFBOVESPA:CPLE6", name: "Copel PNB" },
+  { symbol: "BMFBOVESPA:CSNA3", name: "CSN ON" },
+  { symbol: "BMFBOVESPA:PETR3", name: "Petrobras ON" },
+  { symbol: "BMFBOVESPA:ITSA4", name: "Itaúsa PN" },
+  { symbol: "BMFBOVESPA:RAIL3", name: "Rumo ON" },
+  { symbol: "BMFBOVESPA:B3SA3", name: "B3 ON" }
+];

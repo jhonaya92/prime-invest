@@ -7,7 +7,9 @@ export default function Page() {
     <main className="space-y-4">
       <section className="glass rounded-2xl p-6">
         <h1 className="text-2xl md:text-3xl font-bold">Destaques do dia</h1>
-        <p className="text-gray-400 text-sm">Altas e quedas com carregamento suave.</p>
+        <p className="text-gray-400 text-sm">
+          Altas e quedas com carregamento suave.
+        </p>
       </section>
 
       <section className="grid lg:grid-cols-3 gap-4">
@@ -24,7 +26,9 @@ export default function Page() {
 
       <section className="glass rounded-2xl p-6">
         <h2 className="text-xl font-bold mb-2">Gráfico (teste local)</h2>
-        <p className="text-gray-400 text-sm mb-4">Se a fonte cair, mostramos amostra local automaticamente.</p>
+        <p className="text-gray-400 text-sm mb-4">
+          Se a fonte cair, mostramos amostra local automaticamente.
+        </p>
         <div className="card p-0">
           <LightChart symbol="PETR4" height={380} />
         </div>

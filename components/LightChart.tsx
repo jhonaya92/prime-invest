@@ -8,7 +8,6 @@ function normalizeTicker(input: string) {
   const s = input.includes(":") ? input.split(":")[1] : input;
   return s.trim().toUpperCase();
 }
-
 function genMockCandles(): { candles: any[]; volumes: any[] } {
   const outC: any[] = []; const outV: any[] = [];
   let price = 30 + Math.random() * 20;
@@ -27,7 +26,7 @@ function genMockCandles(): { candles: any[]; volumes: any[] } {
   return { candles: outC, volumes: outV };
 }
 
-export default function LightChart({ symbol, height = 380 }: Props) {
+export default function LightChart({ symbol, height = 520 }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<ReturnType<typeof createChart>>();
   const candleRef = useRef<ISeriesApi<"Candlestick">>();
@@ -37,8 +36,6 @@ export default function LightChart({ symbol, height = 380 }: Props) {
 
   useEffect(() => {
     if (!containerRef.current) return;
-    console.log("[LightChart] mount, container width:", containerRef.current.clientWidth);
-
     const chart = createChart(containerRef.current, {
       height,
       layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: "#cbd5e1" },
@@ -49,20 +46,12 @@ export default function LightChart({ symbol, height = 380 }: Props) {
     });
     chartRef.current = chart;
 
-    const candle = chart.addCandlestickSeries({
-      upColor: "#22c55e", downColor: "#ef4444", borderVisible: false,
-      wickUpColor: "#22c55e", wickDownColor: "#ef4444",
-    });
+    const candle = chart.addCandlestickSeries({ upColor:"#22c55e", downColor:"#ef4444", borderVisible:false, wickUpColor:"#22c55e", wickDownColor:"#ef4444" });
     candleRef.current = candle;
-
     const volume = chart.addHistogramSeries({ priceFormat: { type: "volume" }, priceScaleId: "", base: 0 });
     volumeRef.current = volume;
 
-    const applyWidth = () => {
-      const w = Math.max(300, containerRef.current?.clientWidth || 0);
-      chart.applyOptions({ width: w });
-      console.log("[LightChart] apply width:", w);
-    };
+    const applyWidth = () => chart.applyOptions({ width: Math.max(300, containerRef.current?.clientWidth || 0) });
     applyWidth();
 
     const ro = new ResizeObserver((es) => {
@@ -89,7 +78,7 @@ export default function LightChart({ symbol, height = 380 }: Props) {
         const item = data?.results?.[0];
         const hist = item?.historicalDataPrice || [];
 
-        const toSec = (d: any) => typeof d === "number" ? (d > 20000000000 ? Math.floor(d/1000) : d) : Math.floor(new Date(d).getTime()/1000);
+        const toSec = (d:any)=> typeof d==="number" ? (d>20000000000?Math.floor(d/1000):d) : Math.floor(new Date(d).getTime()/1000);
 
         let candles:any[] = [], volumes:any[] = [];
         if (Array.isArray(hist) && hist.length) {
