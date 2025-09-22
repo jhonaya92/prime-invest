@@ -6,7 +6,9 @@ export default function Page() {
     <main className="space-y-4">
       <section className="glass rounded-2xl p-6">
         <h1 className="text-2xl md:text-3xl font-bold">Destaques do dia</h1>
-        <p className="text-gray-400 text-sm">Altas e quedas com carregamento suave.</p>
+        <p className="text-gray-400 text-sm">
+          Altas e quedas com carregamento suave.
+        </p>
       </section>
 
       <section className="grid lg:grid-cols-3 gap-4">
