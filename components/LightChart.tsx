@@ -29,6 +29,7 @@ export default function LightChart({ symbol, height = 520 }: Props) {
   const candleRef = useRef<SeriesApi | null>(null);
   const volumeRef = useRef<SeriesApi | null>(null);
   const initRef = useRef(false);
+  const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,9 +40,6 @@ export default function LightChart({ symbol, height = 520 }: Props) {
 
     const el = containerRef.current;
     if (!el) return;
-
-    let disposed = false;
-    let cleanup: (() => void) | null = null;
 
     (async () => {
       const L = await import("lightweight-charts");
@@ -58,11 +56,8 @@ export default function LightChart({ symbol, height = 520 }: Props) {
 
       chartRef.current = chart;
       candleRef.current = chart.addCandlestickSeries({
-        upColor: "#22c55e",
-        downColor: "#ef4444",
-        borderVisible: false,
-        wickUpColor: "#22c55e",
-        wickDownColor: "#ef4444",
+        upColor: "#22c55e", downColor: "#ef4444", borderVisible: false,
+        wickUpColor: "#22c55e", wickDownColor: "#ef4444",
       });
       volumeRef.current = chart.addHistogramSeries({ priceFormat: { type: "volume" }, priceScaleId: "", base: 0 });
 
@@ -70,14 +65,16 @@ export default function LightChart({ symbol, height = 520 }: Props) {
         if (!el || !el.isConnected) return;
         chart.applyOptions({ width: Math.max(300, el.clientWidth || 300) });
       };
-
       applyWidth();
+
       const ro = new ResizeObserver(() => applyWidth());
       ro.observe(el);
       const onWin = () => applyWidth();
       window.addEventListener("resize", onWin);
 
-      cleanup = () => {
+      setReady(true); // <- sinaliza que o gráfico existe
+
+      return () => {
         ro.disconnect();
         window.removeEventListener("resize", onWin);
         try { chart.remove(); } catch {}
@@ -85,21 +82,20 @@ export default function LightChart({ symbol, height = 520 }: Props) {
     })().catch((e) => {
       console.error("[LightChart] init error:", e);
       setError("Falha ao iniciar o gráfico — usando amostra local.");
+      const m = genMock();
+      setReady(false);
       setLoading(false);
     });
-
-    return () => {
-      disposed = true;
-      if (cleanup) cleanup();
-    };
   }, [height]);
 
-  // dados
+  // busca dados assim que o gráfico estiver pronto OU o símbolo mudar
   useEffect(() => {
+    if (!ready || !chartRef.current || !candleRef.current || !volumeRef.current) return;
+
     let cancelled = false;
+    setLoading(true); setError(null);
+
     (async () => {
-      if (!chartRef.current || !candleRef.current || !volumeRef.current) return;
-      setLoading(true); setError(null);
       try {
         const t = symbol.includes(":") ? symbol.split(":")[1].toUpperCase() : symbol.toUpperCase();
         const res = await fetch(`/api/quote/${encodeURIComponent(t)}`);
@@ -133,8 +129,9 @@ export default function LightChart({ symbol, height = 520 }: Props) {
         }
       } finally { if (!cancelled) setLoading(false); }
     })();
+
     return () => { cancelled = true; };
-  }, [symbol]);
+  }, [symbol, ready]);
 
   return (
     <div className="rounded-2xl overflow-hidden border border-white/10 relative" style={{ height, width: "100%" }}>
