@@ -60,8 +60,7 @@ export default function LightChart({ symbol, height = 520 }: Props) {
       setError(null);
       try {
         const t = normalizeTicker(symbol);
-        const url = `https://brapi.dev/api/quote/${encodeURIComponent(t)}?range=1y&interval=1d&fundamental=true`;
-        const res = await fetch(url);
+        const res = await fetch(`/api/quote/${encodeURIComponent(t)}`);
         if (!res.ok) throw new Error("Falha ao buscar dados");
         const data = await res.json();
         const item = data?.results?.[0];
@@ -72,8 +71,7 @@ export default function LightChart({ symbol, height = 520 }: Props) {
 
         const candles = hist.map((h: any) => ({
           time: toSec(h.date) as UTCTimestamp,
-          open: Number(h.open), high: Number(h.high),
-          low: Number(h.low), close: Number(h.close),
+          open: Number(h.open), high: Number(h.high), low: Number(h.low), close: Number(h.close),
         })).sort((a: any, b: any) => (a.time as number) - (b.time as number));
 
         const volumes = hist.map((h: any) => {
