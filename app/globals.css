@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0B0F14;
+  --card: #121821;
+  --accent: #E5C375;
+}
+
+html, body, #__next { height: 100%; }
+
+body {
+  background: radial-gradient(1200px 600px at 80% -10%, rgba(33, 96, 142, 0.18), transparent),
+              radial-gradient(700px 400px at -10% 20%, rgba(229, 195, 117, 0.10), transparent),
+              #0B0F14;
+  color: #E6EDF6;
+}
+
+.container { @apply max-w-7xl mx-auto px-4; }
+.glass { background: rgba(18,24,33,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); box-shadow: 0 12px 30px rgba(0,0,0,0.35); }
+.card { @apply glass rounded-2xl p-5; }
+
+.link { @apply hover:text-white transition; }
+
+/* toast styles */
+.toast { @apply glass rounded-2xl px-4 py-3 flex items-start gap-3 border border-white/10; }
+.toast-progress { @apply absolute left-0 bottom-0 h-0.5 bg-[var(--accent)] rounded-full; animation: progress 5s linear forwards; }
