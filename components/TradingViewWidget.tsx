@@ -1,4 +1,4 @@
-'use client';
+"use client";
 import { useEffect, useRef } from "react";
 
 type Props = {
@@ -6,7 +6,11 @@ type Props = {
   height?: number;
   interval?: string; // "D", "60", etc.
 };
-export default function TradingViewWidget({ symbol, height = 420, interval = "D" }: Props) {
+export default function TradingViewWidget({
+  symbol,
+  height = 420,
+  interval = "D",
+}: Props) {
   const container = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -35,9 +39,13 @@ export default function TradingViewWidget({ symbol, height = 420, interval = "D"
       }
     };
     container.current.appendChild(script);
-    return () => { container.current && (container.current.innerHTML = ""); };
+    return () => {
+      container.current && (container.current.innerHTML = "");
+    };
   }, [symbol, interval]);
 
   const id = "tv_" + symbol.replace(/[^A-Z0-9]/gi, "");
-  return <div id={id} ref={container} style={{ height }} className="w-full card" />;
+  return (
+    <div id={id} ref={container} style={{ height }} className="w-full card" />
+  );
 }
