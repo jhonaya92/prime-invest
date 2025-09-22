@@ -6,18 +6,25 @@ type ChartApi = any;
 type SeriesApi = any;
 
 function genMock() {
-  const outC: any[] = []; const outV: any[] = [];
+  const outC: any[] = [];
+  const outV: any[] = [];
   let price = 30 + Math.random() * 20;
-  const now = Math.floor(Date.now() / 1000), day = 86400;
+  const now = Math.floor(Date.now() / 1000),
+    day = 86400;
   for (let i = 119; i >= 0; i--) {
-    const time = (now - i * day);
+    const time = now - i * day;
     const drift = (Math.random() - 0.5) * 1.2;
-    const open = price, close = Math.max(1, open + drift);
+    const open = price,
+      close = Math.max(1, open + drift);
     const high = Math.max(open, close) + Math.random() * 0.6;
     const low = Math.min(open, close) - Math.random() * 0.6;
     const vol = 1_000_000 + Math.floor(Math.random() * 3_000_000);
     outC.push({ time, open, high, low, close });
-    outV.push({ time, value: vol, color: close >= open ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)" });
+    outV.push({
+      time,
+      value: vol,
+      color: close >= open ? "rgba(34,197,94,0.35)" : "rgba(239,68,68,0.35)",
+    });
     price = close;
   }
   return { candles: outC, volumes: outV };
@@ -47,8 +54,14 @@ export default function LightChart({ symbol, height = 520 }: Props) {
 
       const chart: ChartApi = createChart(el, {
         height,
-        layout: { background: { type: ColorType.Solid, color: "transparent" }, textColor: "#cbd5e1" },
-        grid: { vertLines: { color: "rgba(255,255,255,0.06)" }, horzLines: { color: "rgba(255,255,255,0.06)" } },
+        layout: {
+          background: { type: ColorType.Solid, color: "transparent" },
+          textColor: "#cbd5e1",
+        },
+        grid: {
+          vertLines: { color: "rgba(255,255,255,0.06)" },
+          horzLines: { color: "rgba(255,255,255,0.06)" },
+        },
         crosshair: { mode: 1 },
         rightPriceScale: { borderColor: "rgba(255,255,255,0.08)" },
         timeScale: { borderColor: "rgba(255,255,255,0.08)" },
@@ -56,10 +69,17 @@ export default function LightChart({ symbol, height = 520 }: Props) {
 
       chartRef.current = chart;
       candleRef.current = chart.addCandlestickSeries({
-        upColor: "#22c55e", downColor: "#ef4444", borderVisible: false,
-        wickUpColor: "#22c55e", wickDownColor: "#ef4444",
+        upColor: "#22c55e",
+        downColor: "#ef4444",
+        borderVisible: false,
+        wickUpColor: "#22c55e",
+        wickDownColor: "#ef4444",
       });
-      volumeRef.current = chart.addHistogramSeries({ priceFormat: { type: "volume" }, priceScaleId: "", base: 0 });
+      volumeRef.current = chart.addHistogramSeries({
+        priceFormat: { type: "volume" },
+        priceScaleId: "",
+        base: 0,
+      });
 
       const applyWidth = () => {
         if (!el || !el.isConnected) return;
@@ -77,7 +97,9 @@ export default function LightChart({ symbol, height = 520 }: Props) {
       return () => {
         ro.disconnect();
         window.removeEventListener("resize", onWin);
-        try { chart.remove(); } catch {}
+        try {
+          chart.remove();
+        } catch {}
       };
     })().catch((e) => {
       console.error("[LightChart] init error:", e);
@@ -90,26 +112,51 @@ export default function LightChart({ symbol, height = 520 }: Props) {
 
   // busca dados assim que o gráfico estiver pronto OU o símbolo mudar
   useEffect(() => {
-    if (!ready || !chartRef.current || !candleRef.current || !volumeRef.current) return;
+    if (!ready || !chartRef.current || !candleRef.current || !volumeRef.current)
+      return;
 
     let cancelled = false;
-    setLoading(true); setError(null);
+    setLoading(true);
+    setError(null);
 
     (async () => {
       try {
-        const t = symbol.includes(":") ? symbol.split(":")[1].toUpperCase() : symbol.toUpperCase();
+        const t = symbol.includes(":")
+          ? symbol.split(":")[1].toUpperCase()
+          : symbol.toUpperCase();
         const res = await fetch(`/api/quote/${encodeURIComponent(t)}`);
         const ok = res.ok;
         const data = ok ? await res.json() : null;
         const hist = data?.results?.[0]?.historicalDataPrice || [];
 
-        let candles:any[] = [], volumes:any[] = [];
+        let candles: any[] = [],
+          volumes: any[] = [];
         if (Array.isArray(hist) && hist.length) {
-          const toSec = (d:any)=> typeof d==="number" ? (d>20000000000?Math.floor(d/1000):d) : Math.floor(new Date(d).getTime()/1000);
-          candles = hist.map((h:any)=>({ time: toSec(h.date), open:+h.open, high:+h.high, low:+h.low, close:+h.close }))
-                        .sort((a,b)=>a.time-b.time);
-          volumes = hist.map((h:any)=>({ time: toSec(h.date), value:+h.volume||0, color:(+h.close>=+h.open)?"rgba(34,197,94,0.35)":"rgba(239,68,68,0.35)" }))
-                        .sort((a,b)=>a.time-b.time);
+          const toSec = (d: any) =>
+            typeof d === "number"
+              ? d > 20000000000
+                ? Math.floor(d / 1000)
+                : d
+              : Math.floor(new Date(d).getTime() / 1000);
+          candles = hist
+            .map((h: any) => ({
+              time: toSec(h.date),
+              open: +h.open,
+              high: +h.high,
+              low: +h.low,
+              close: +h.close,
+            }))
+            .sort((a, b) => a.time - b.time);
+          volumes = hist
+            .map((h: any) => ({
+              time: toSec(h.date),
+              value: +h.volume || 0,
+              color:
+                +h.close >= +h.open
+                  ? "rgba(34,197,94,0.35)"
+                  : "rgba(239,68,68,0.35)",
+            }))
+            .sort((a, b) => a.time - b.time);
         } else {
           ({ candles, volumes } = genMock());
           setError("Dados remotos indisponíveis — amostra local.");
@@ -119,7 +166,7 @@ export default function LightChart({ symbol, height = 520 }: Props) {
         candleRef.current.setData(candles);
         volumeRef.current.setData(volumes);
         chartRef.current.timeScale().fitContent();
-      } catch (e:any) {
+      } catch (e: any) {
         if (!cancelled) {
           const m = genMock();
           candleRef.current!.setData(m.candles);
@@ -127,17 +174,34 @@ export default function LightChart({ symbol, height = 520 }: Props) {
           chartRef.current!.timeScale().fitContent();
           setError(e?.message || "Erro — amostra local.");
         }
-      } finally { if (!cancelled) setLoading(false); }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [symbol, ready]);
 
   return (
-    <div className="rounded-2xl overflow-hidden border border-white/10 relative" style={{ height, width: "100%" }}>
+    <div
+      className="rounded-2xl overflow-hidden border border-white/10 relative"
+      style={{ height, width: "100%" }}
+    >
       <div ref={containerRef} style={{ height: "100%", width: "100%" }} />
-      {loading && <div className="absolute inset-0 grid place-items-center bg-black/20"><div className="animate-pulse text-sm text-gray-300">Carregando gráfico…</div></div>}
-      {error && !loading && <div className="absolute left-2 bottom-2 text-[11px] text-amber-300 bg-black/40 px-2 py-1 rounded">{error}</div>}
+      {loading && (
+        <div className="absolute inset-0 grid place-items-center bg-black/20">
+          <div className="animate-pulse text-sm text-gray-300">
+            Carregando gráfico…
+          </div>
+        </div>
+      )}
+      {error && !loading && (
+        <div className="absolute left-2 bottom-2 text-[11px] text-amber-300 bg-black/40 px-2 py-1 rounded">
+          {error}
+        </div>
+      )}
     </div>
   );
 }
