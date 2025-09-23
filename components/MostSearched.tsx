@@ -1,38 +1,37 @@
-﻿import Link from "next/link";
+﻿type CardProps = { title: string; subtitle?: string; price?: string; change?: number };
 
-const top = [
-  { sym: "BMFBOVESPA:PETR4", name: "Petróleo Brasileiro S.A. - Petrobras", price: 31.37, change: 1.0 },
-  { sym: "BMFBOVESPA:VALE3", name: "Vale S.A.", price: 58.0, change: 0.14 },
-  { sym: "BMFBOVESPA:ITUB4", name: "Itaú Unibanco Holding S.A.", price: 38.44, change: -1.44 },
-];
-const others = ["BMFBOVESPA:BBDC4","BMFBOVESPA:BBAS3","BMFBOVESPA:PRIO3"];
-
-export default function MostSearched(){
+function Mini({ title, subtitle, price, change }: CardProps) {
+  const cls =
+    change === undefined ? "text-gray-400" : change >= 0 ? "text-green-400" : "text-red-400";
   return (
-    <aside className="space-y-4">
-      <div className="card">
-        <div className="text-sm text-gray-300 mb-3">Mais buscadas</div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {top.map((a,i)=>(
-            <Link
-              key={i}
-              href={"/ativos/" + encodeURIComponent(a.sym)}
-              className="rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition p-3 flex flex-col justify-between min-h-[110px]"
-            >
-              <div className="text-xs text-gray-400 truncate">{a.name}</div>
-              <div className="text-lg font-extrabold">{a.sym.split(":")[1]}</div>
-              <div className="text-sm text-gray-300">R$ {a.price.toFixed(2)} <span className={a.change>=0?"text-green-400":"text-red-400"}>{a.change>0?"+":""}{a.change.toFixed(2)}%</span></div>
-            </Link>
-          ))}
-        </div>
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-3">
-          {others.map((s,i)=>(
-            <Link key={i} href={"/ativos/" + encodeURIComponent(s)} className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 text-center hover:bg-white/10">
-              {s.split(":")[1]}
-            </Link>
-          ))}
-        </div>
+    <div className="rounded-2xl bg-white/5 border border-white/10 p-3">
+      <div className="text-xs text-gray-400 truncate">{subtitle || "—"}</div>
+      <div className="text-lg font-bold">{title}</div>
+      <div className="text-sm text-gray-300">{price ?? "—"}</div>
+      <div className={`text-sm ${cls}`}>{change !== undefined ? `${change>0?"+":""}${change.toFixed(2)}%` : "—"}</div>
+    </div>
+  );
+}
+
+export default function MostSearched() {
+  const items = [
+    { title:"PETR4", subtitle:"Petróleo Brasileiro S.A.", price:"R$ 31,37", change:1.00 },
+    { title:"VALE3", subtitle:"Vale S.A.", price:"R$ 58,00", change:0.14 },
+    { title:"ITUB4", subtitle:"Itaú Unibanco", price:"R$ 38,44", change:-1.44 },
+  ];
+  const peers = ["BBDC4","BBAS3","PRIO3"];
+
+  return (
+    <div className="card min-h-[340px] flex flex-col">
+      <div className="text-sm text-gray-300 mb-3">Mais buscadas</div>
+      <div className="grid sm:grid-cols-3 gap-3 mb-4">
+        {items.map((it, i)=> (<Mini key={i} {...it} />))}
       </div>
-    </aside>
+      <div className="mt-auto grid grid-cols-3 gap-3">
+        {peers.map((p,i)=>(
+          <a key={i} href={`/ativos/BMFBOVESPA:${p}`} className="btn soft text-center">{p}</a>
+        ))}
+      </div>
+    </div>
   );
 }

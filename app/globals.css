@@ -55,3 +55,10 @@ body {
   @apply absolute left-0 bottom-0 h-0.5 bg-[var(--accent)] rounded-full;
   animation: progress 5s linear forwards;
 }
+.btn{ @apply rounded-xl px-4 py-2 border border-white/10 bg-white/5 text-sm; }
+.btn.ghost{ @apply hover:bg-white/10; }
+.btn.primary{ @apply bg-amber-300 text-black font-semibold hover:brightness-95; }
+.btn.soft{ @apply bg-white/5 border border-white/10 hover:bg-white/10; }
+.input{ @apply rounded-xl px-4 py-2 bg-white/5 border border-white/10 outline-none text-sm; }
+.chip{ @apply rounded-xl px-3 py-1.5 bg-white/5 border border-white/10 text-sm; }
+.card{ @apply rounded-2xl p-6 border border-white/10 bg-white/5 shadow-[0_10px_30px_rgba(0,0,0,.25)]; }

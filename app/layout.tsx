@@ -5,16 +5,16 @@ import QuoteChips from "@/components/QuoteChips";
 
 export const metadata: Metadata = {
   title: "Prime Invest Demo v2",
-  description: "Visual demo com TradingView e destaques.",
+  description: "Demo visual com cotações, destaques e gráfico.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-br">
       <body>
-        <Header />
-        <div className="container pb-10">
-          <QuoteChips />
+        <div className="container py-6">
+          <Header />
+          <div className="mb-4"><QuoteChips /></div>
           {children}
           <footer className="text-xs text-gray-400 mt-10 mb-6 text-center">
             {new Date().getFullYear()} Prime Invest — demo visual

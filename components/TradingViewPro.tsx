@@ -1,99 +1,47 @@
 ﻿"use client";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
-type Props = { symbol: string; height?: number };
-
-export default function TradingViewPro({ symbol, height = 420 }: Props) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [useIframe, setUseIframe] = useState(false);
-
-  // id único por símbolo (evita conflito do script do TV)
-  const frameId = useMemo(() => "tv_" + btoa(symbol).replace(/=/g, ""), [symbol]);
+export default function TradingViewPro({ symbol, height=360 }: { symbol: string; height?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!ref.current) return;
+    ref.current.innerHTML = ""; // limpa se trocar o símbolo
 
-    // Limpa container a cada troca de símbolo
-    containerRef.current.innerHTML = "";
-    setUseIframe(false);
+    const container = document.createElement("div");
+    container.className = "tradingview-widget-container__widget";
+    container.style.height = height + "px";
+    container.style.width = "100%";
 
-    // Tenta usar o script oficial
-    const timerFallback = setTimeout(() => setUseIframe(true), 1800);
-
-    const s = document.createElement("script");
-    s.src = "https://s3.tradingview.com/tv.js";
-    s.async = true;
-    s.onload = () => {
-      try {
-        // @ts-ignore
-        if (window.TradingView) {
-          // @ts-ignore
-          new window.TradingView.widget({
-            symbol,
-            interval: "D",
-            timezone: "America/Sao_Paulo",
-            theme: "dark",
-            style: "1",
-            locale: "br",
-            hide_legend: false,
-            enable_publishing: false,
-            allow_symbol_change: false,
-            container_id: frameId,
-            autosize: true,
-            withdateranges: true,
-            hide_side_toolbar: false,
-          });
-          clearTimeout(timerFallback);
-        } else {
-          setUseIframe(true);
-        }
-      } catch {
-        setUseIframe(true);
-      }
-    };
-    s.onerror = () => setUseIframe(true);
-
-    const w = document.createElement("div");
-    w.id = frameId;
-    w.style.width = "100%";
-    w.style.minHeight = height + "px";
-    containerRef.current.appendChild(w);
-    containerRef.current.appendChild(s);
-
-    return () => { clearTimeout(timerFallback); };
-  }, [symbol, frameId, height]);
-
-  if (useIframe) {
-    // Fallback estável (mostra sempre)
-    const url = new URL("https://s.tradingview.com/widgetembed/");
-    url.search = new URLSearchParams({
+    const script = document.createElement("script");
+    script.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    script.async = true;
+    script.innerHTML = JSON.stringify({
       symbol,
+      autosize: true,
       interval: "D",
-      toolbarbg: "rgba(0,0,0,0)",
-      hidetoptoolbar: "0",
-      hide_legend: "0",
+      timezone: "America/Sao_Paulo",
       theme: "dark",
       style: "1",
-      timezone: "America/Sao_Paulo",
       locale: "br",
-      enable_publishing: "false",
-      withdateranges: "true",
-      hide_side_toolbar: "false",
-    }).toString();
+      enable_publishing: false,
+      allow_symbol_change: false,
+      hide_top_toolbar: false,
+      withdateranges: true,
+      details: false,
+      hide_legend: false,
+      studies: ["Volume@tv-basicstudies"]
+    });
 
-    return (
-      <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5" style={{ minHeight: height }}>
-        <iframe
-          title={"Chart " + symbol}
-          src={url.toString()}
-          style={{ width: "100%", height }}
-          frameBorder="0"
-          allowTransparency
-          allowFullScreen
-        />
-      </div>
-    );
-  }
+    ref.current.appendChild(container);
+    ref.current.appendChild(script);
 
-  return <div ref={containerRef} className="rounded-xl overflow-hidden border border-white/10" style={{ minHeight: height }} />;
+    return () => { if (ref.current) ref.current.innerHTML = ""; };
+  }, [symbol, height]);
+
+  return (
+    <div ref={ref} className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden" style={{height}}>
+      {/* TradingView injeta aqui */}
+    </div>
+  );
 }
