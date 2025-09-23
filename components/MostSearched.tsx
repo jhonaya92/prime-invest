@@ -1,28 +1,45 @@
-﻿type CardProps = { title: string; subtitle?: string; price?: string; change?: number };
-function Mini({ title, subtitle, price, change }: CardProps) {
-  const cls = change===undefined?"text-gray-400":change>=0?"text-green-400":"text-red-400";
+﻿"use client";
+type Item = { sym: string; name: string; price?: number; change?: number };
+
+const items: Item[] = [
+  { sym: "BMFBOVESPA:PETR4", name: "Petróleo Brasileiro S.A.", price: 31.37, change: +1.00 },
+  { sym: "BMFBOVESPA:VALE3", name: "Vale S.A.", price: 58.00, change: +0.14 },
+  { sym: "BMFBOVESPA:ITUB4", name: "Itaú Unibanco", price: 38.44, change: -1.44 },
+  { sym: "BMFBOVESPA:BBDC4", name: "Bradesco" },
+  { sym: "BMFBOVESPA:BBAS3", name: "Banco do Brasil" },
+  { sym: "BMFBOVESPA:PRIO3", name: "PRIO" },
+];
+
+export default function MostSearched() {
   return (
-    <div className="rounded-2xl bg-white/5 border border-white/10 p-3 h-full">
-      <div className="text-xs text-gray-400 truncate">{subtitle || "—"}</div>
-      <div className="text-lg font-bold">{title}</div>
-      <div className="text-sm text-gray-300">{price ?? "—"}</div>
-      <div className={`text-sm ${cls}`}>{change!==undefined?`${change>0?"+":""}${change.toFixed(2)}%`:"—"}</div>
-    </div>
-  );
-}
-export default function MostSearched(){
-  const items = [
-    { title:"PETR4", subtitle:"Petróleo Brasileiro S.A.", price:"R$ 31,37", change:1.00 },
-    { title:"VALE3", subtitle:"Vale S.A.", price:"R$ 58,00", change:0.14 },
-    { title:"ITUB4", subtitle:"Itaú Unibanco", price:"R$ 38,44", change:-1.44 },
-  ];
-  const peers = ["BBDC4","BBAS3","PRIO3"];
-  return (
-    <div className="card min-h-[340px] flex flex-col">
+    <div className="card">
       <div className="text-sm text-gray-300 mb-3">Mais buscadas</div>
-      <div className="grid sm:grid-cols-3 gap-3 mb-4">{items.map((it,i)=>(<Mini key={i} {...it}/>))}</div>
-      <div className="mt-auto grid grid-cols-3 gap-3">
-        {peers.map((p,i)=>(<a key={i} href={`/ativos/BMFBOVESPA:${p}`} className="btn soft text-center">{p}</a>))}
+      <div className="grid md:grid-cols-3 gap-3">
+        {items.map((it) => {
+          const code = it.sym.split(":").pop();
+          const up = (it.change ?? 0) >= 0;
+          return (
+            <a key={it.sym} href={`/ativos/${encodeURIComponent(it.sym)}`} className="block rounded-xl bg-white/5 border border-white/10 p-3 hover:bg-white/10 transition">
+              <div className="text-sm font-semibold">{code}</div>
+              <div className="text-xs text-gray-400 truncate">{it.name}</div>
+              <div className="mt-1 text-sm">
+                {it.price !== undefined ? (
+                  <>
+                    <span className="text-gray-200">R$ {it.price.toFixed(2)}</span>
+                    <span className={`ml-2 ${up ? "text-green-400" : "text-red-400"}`}>
+                      {up ? "+" : ""}{(it.change ?? 0).toFixed(2)}%
+                    </span>
+                  </>
+                ) : <span className="text-gray-500">—</span>}
+              </div>
+            </a>
+          );
+        })}
+      </div>
+      <div className="mt-4 grid grid-cols-3 gap-3">
+        {["BBDC4","BBAS3","PRIO3"].map(c=>(
+          <a key={c} href={`/ativos/${encodeURIComponent("BMFBOVESPA:"+c)}`} className="btn soft text-center">{c}</a>
+        ))}
       </div>
     </div>
   );

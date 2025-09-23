@@ -8,13 +8,19 @@ export const metadata: Metadata = {
   description: "Demo visual com cotações, destaques, análise e gráfico.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="pt-br">
       <body>
         <div className="container py-6">
           <Header />
-          <div className="mb-4"><QuoteChips /></div>
+          <div className="mb-4">
+            <QuoteChips />
+          </div>
           {children}
           <footer className="text-xs text-gray-400 mt-10 mb-6 text-center">
             {new Date().getFullYear()} Prime Invest — demo visual

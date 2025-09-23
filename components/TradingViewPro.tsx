@@ -1,33 +1,62 @@
 ﻿"use client";
 import { useEffect, useRef } from "react";
 
-export default function TradingViewPro({ symbol, height=420 }: { symbol: string; height?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
+declare global {
+  interface Window { TradingView?: any }
+}
+
+type Props = { symbol: string; height?: number };
+
+export default function TradingViewPro({ symbol, height = 420 }: Props) {
+  const hostRef = useRef<HTMLDivElement | null>(null);
+  const loadedRef = useRef<boolean>(false);
+
   useEffect(() => {
-    if (!ref.current) return;
-    ref.current.innerHTML = "";
-    const widget = document.createElement("div");
-    widget.className = "tradingview-widget-container__widget";
-    widget.style.height = height + "px";
-    widget.style.width = "100%";
-    const s = document.createElement("script");
-    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
-    s.async = true;
-    s.innerHTML = JSON.stringify({
-      symbol,
-      autosize: true,
-      interval: "D",
-      timezone: "America/Sao_Paulo",
-      theme: "dark",
-      style: "1",
-      locale: "br",
-      allow_symbol_change: false,
-      withdateranges: true,
-      studies: ["Volume@tv-basicstudies"]
-    });
-    ref.current.appendChild(widget);
-    ref.current.appendChild(s);
-    return ()=>{ if(ref.current) ref.current.innerHTML=""; };
+    if (!hostRef.current) return;
+
+    // cria container interno com id estável
+    const id = "tv_" + Math.random().toString(36).slice(2);
+    hostRef.current.innerHTML = `<div id="${id}" style="height:${height}px; min-height:${height}px;"></div>`;
+
+    const inject = () => {
+      if (!window.TradingView) return;
+      // limpa instância anterior
+      try { (hostRef.current as HTMLDivElement).querySelectorAll("iframe").forEach(n=>n.remove()); } catch {}
+      new window.TradingView.widget({
+        container_id: id,
+        symbol,
+        autosize: true,
+        interval: "D",
+        timezone: "America/Sao_Paulo",
+        theme: "dark",
+        style: "1",
+        locale: "br",
+        hide_top_toolbar: false,
+        hide_legend: false,
+        allow_symbol_change: false,
+        withdateranges: true,
+        studies: ["Volume@tv-basicstudies"],
+      });
+    };
+
+    if (window.TradingView) {
+      inject();
+    } else if (!loadedRef.current) {
+      const s = document.createElement("script");
+      s.src = "https://s3.tradingview.com/tv.js";
+      s.onload = () => { loadedRef.current = true; inject(); };
+      s.onerror = () => { hostRef.current!.innerHTML = "<div class='text-sm text-gray-400 p-4'>Falha ao carregar gráfico.</div>"; };
+      document.body.appendChild(s);
+    } else {
+      // script já pedido, tenta de novo em seguida
+      const t = setTimeout(inject, 300);
+      return () => clearTimeout(t);
+    }
+
+    return () => { if (hostRef.current) hostRef.current.innerHTML = ""; };
   }, [symbol, height]);
-  return <div ref={ref} className="rounded-2xl bg-white/5 border border-white/10 overflow-hidden" style={{height}} />;
+
+  return (
+    <div ref={hostRef} className="rounded-xl overflow-hidden border border-white/10 bg-[#101418]" />
+  );
 }

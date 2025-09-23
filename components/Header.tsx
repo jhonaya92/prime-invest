@@ -12,15 +12,28 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-3">
-          <Link className="chip" href="/dashboard">Dashboard</Link>
-          <Link className="chip" href="/ativos">Ativos</Link>
-          <Link className="chip" href="/academy">Academy</Link>
-          <Link className="chip" href="/club">Club</Link>
-          <Link className="chip" href="/planos">Planos</Link>
+          <Link className="chip" href="/dashboard">
+            Dashboard
+          </Link>
+          <Link className="chip" href="/ativos">
+            Ativos
+          </Link>
+          <Link className="chip" href="/academy">
+            Academy
+          </Link>
+          <Link className="chip" href="/club">
+            Club
+          </Link>
+          <Link className="chip" href="/planos">
+            Planos
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3">
-          <input placeholder="Buscar ação (ex: PETR4, VALE3)" className="hidden lg:block input" />
+          <input
+            placeholder="Buscar ação (ex: PETR4, VALE3)"
+            className="hidden lg:block input"
+          />
           <button className="btn ghost">Entrar</button>
           <button className="btn primary">Criar conta</button>
         </div>
