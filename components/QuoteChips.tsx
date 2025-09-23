@@ -37,7 +37,7 @@ export default function QuoteChips({ tickers = LIST }: { tickers?: string[] }) {
             } catch {
               return { sym: s } as Row; // fallback seguro
             }
-          })
+          }),
         );
         if (!dead) setRows(data.filter((x) => !!x && !!x.sym));
       } finally {
@@ -55,7 +55,10 @@ export default function QuoteChips({ tickers = LIST }: { tickers?: string[] }) {
       <div className="overflow-x-auto scrollbar-thin">
         <div className="flex items-center gap-2 min-w-max">
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10">
+            <div
+              key={i}
+              className="px-3 py-1.5 rounded-xl bg-white/5 border border-white/10"
+            >
               <div className="h-4 w-16 bg-white/10 rounded animate-pulse" />
             </div>
           ))}
@@ -75,9 +78,15 @@ export default function QuoteChips({ tickers = LIST }: { tickers?: string[] }) {
             const price =
               r.price !== undefined ? "R$ " + r.price.toFixed(2) : "—";
             const chgTxt =
-              r.chg === undefined ? "—" : (r.chg >= 0 ? "+" : "") + r.chg.toFixed(2) + "%";
+              r.chg === undefined
+                ? "—"
+                : (r.chg >= 0 ? "+" : "") + r.chg.toFixed(2) + "%";
             const chgCls =
-              r.chg === undefined ? "text-gray-400" : r.chg >= 0 ? "text-green-400" : "text-red-400";
+              r.chg === undefined
+                ? "text-gray-400"
+                : r.chg >= 0
+                  ? "text-green-400"
+                  : "text-red-400";
 
             return (
               <a
