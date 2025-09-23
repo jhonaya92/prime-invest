@@ -11,9 +11,7 @@ export default function Page() {
       </section>
 
       <section className="grid lg:grid-cols-3 gap-4">
-        <div className="lg:col-span-2">
-          <Highlights />
-        </div>
+        <div className="lg:col-span-2"><Highlights /></div>
         <div className="space-y-4">
           <div className="card">
             <div className="text-sm text-gray-300 mb-2">Mais buscadas</div>
@@ -22,9 +20,7 @@ export default function Page() {
         </div>
       </section>
 
-      <section>
-        <ChartCard initial="BMFBOVESPA:PETR4" height={380}/>
-      </section>
+      <section><ChartCard initial="BMFBOVESPA:PETR4" height={380}/></section>
     </main>
   );
 }

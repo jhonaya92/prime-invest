@@ -13,7 +13,11 @@ const DEFAULTS = [
   "BMFBOVESPA:PRIO3",
 ];
 
-export default function TrendingGrid({ tickers = DEFAULTS }: { tickers?: string[] }) {
+export default function TrendingGrid({
+  tickers = DEFAULTS,
+}: {
+  tickers?: string[];
+}) {
   const [rows, setRows] = useState<Row[]>(tickers.map((s) => ({ symbol: s })));
   const [loading, setLoading] = useState(true);
 
@@ -34,7 +38,7 @@ export default function TrendingGrid({ tickers = DEFAULTS }: { tickers?: string[
               price: q?.regularMarketPrice ?? q?.close ?? undefined,
               change: q?.regularMarketChangePercent ?? undefined,
             } as Row;
-          })
+          }),
         );
         if (!dead) setRows(data);
       } finally {
@@ -51,7 +55,10 @@ export default function TrendingGrid({ tickers = DEFAULTS }: { tickers?: string[
     return (
       <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-3">
         {Array.from({ length: 6 }).map((_, i) => (
-          <div key={i} className="rounded-2xl p-4 bg-white/5 border border-white/10">
+          <div
+            key={i}
+            className="rounded-2xl p-4 bg-white/5 border border-white/10"
+          >
             <div className="h-4 w-28 bg-white/10 rounded animate-pulse mb-2" />
             <div className="h-3 w-16 bg-white/10 rounded animate-pulse" />
           </div>
@@ -81,11 +88,13 @@ export default function TrendingGrid({ tickers = DEFAULTS }: { tickers?: string[
                     r.change === undefined
                       ? "text-gray-400"
                       : r.change >= 0
-                      ? "text-green-400"
-                      : "text-red-400"
+                        ? "text-green-400"
+                        : "text-red-400"
                   }`}
                 >
-                  {r.change === undefined ? "—" : (r.change >= 0 ? "+" : "") + r.change.toFixed(2) + "%"}
+                  {r.change === undefined
+                    ? "—"
+                    : (r.change >= 0 ? "+" : "") + r.change.toFixed(2) + "%"}
                 </div>
               </div>
               <div className="text-xs text-gray-400">{r.name || code}</div>

@@ -1,44 +1,30 @@
 ﻿"use client";
 import Link from "next/link";
-import Image from "next/image";
 import SearchBar from "./SearchBar";
 
-const NAV = [
-  { href: "/", label: "Dashboard" },
-  { href: "/ativos/BMFBOVESPA:PETR4", label: "Ativos" },
-  { href: "/academy", label: "Academy" },
-  { href: "/club", label: "Club" },
-  { href: "/planos", label: "Planos" },
-];
-
-export default function Header() {
+export default function Header(){
+  const nav = [
+    { href: "/", label: "Dashboard" },
+    { href: "/ativos/BMFBOVESPA:PETR4", label: "Ativos" },
+    { href: "/academy", label: "Academy" },
+    { href: "/club", label: "Club" },
+    { href: "/planos", label: "Planos" },
+  ];
   return (
     <header className="mb-4">
-      <div className="mx-auto max-w-7xl px-4 md:px-6">
-        <div className="glass rounded-2xl py-2 px-3 md:px-4 flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2 shrink-0">
-            <Image src="/logo.png" width={28} height={28} alt="Prime Invest" />
-            <span className="font-extrabold tracking-wide text-sm md:text-base">
-              PRIME INVEST
-            </span>
-          </Link>
-
-          <nav className="ml-2 md:ml-4 hidden sm:flex items-center gap-2">
-            {NAV.map((n) => (
-              <Link
-                key={n.href}
-                href={n.href}
-                className="px-3 py-1.5 rounded-xl hover:bg-white/5 text-sm text-gray-300"
-              >
-                {n.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="ml-auto w-40 sm:w-64 md:w-80">
-            <SearchBar />
-          </div>
-        </div>
+      <div className="flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2">
+          <img src="/logo.png" alt="Prime Invest" className="h-8 w-8 rounded-lg"/>
+          <span className="font-extrabold tracking-wide">PRIME INVEST</span>
+        </Link>
+        <nav className="hidden md:flex items-center gap-3">
+          {nav.map((n)=>(
+            <Link key={n.href} href={n.href} className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-sm transition">
+              {n.label}
+            </Link>
+          ))}
+        </nav>
+        <div className="w-[220px] md:w-[320px]"><SearchBar /></div>
       </div>
     </header>
   );
