@@ -1,79 +1,99 @@
 ﻿"use client";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
-export default function TradingViewPro({
-  symbol = "BMFBOVESPA:PETR4",
-  height = 420,
-}: {
-  symbol?: string;
-  height?: number;
-}) {
-  const ref = useRef<HTMLDivElement>(null);
-  const [failed, setFailed] = useState(false);
+type Props = { symbol: string; height?: number };
+
+export default function TradingViewPro({ symbol, height = 420 }: Props) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [useIframe, setUseIframe] = useState(false);
+
+  // id único por símbolo (evita conflito do script do TV)
+  const frameId = useMemo(() => "tv_" + btoa(symbol).replace(/=/g, ""), [symbol]);
 
   useEffect(() => {
-    const el = ref.current;
-    if (!el) return;
+    if (!containerRef.current) return;
 
-    setFailed(false);
-    el.innerHTML = "";
+    // Limpa container a cada troca de símbolo
+    containerRef.current.innerHTML = "";
+    setUseIframe(false);
 
-    const widget = document.createElement("div");
-    widget.className = "tradingview-widget-container__widget";
-    el.appendChild(widget);
+    // Tenta usar o script oficial
+    const timerFallback = setTimeout(() => setUseIframe(true), 1800);
 
     const s = document.createElement("script");
-    s.src = "https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js";
+    s.src = "https://s3.tradingview.com/tv.js";
     s.async = true;
-    s.innerHTML = JSON.stringify({
-      autosize: true,
+    s.onload = () => {
+      try {
+        // @ts-ignore
+        if (window.TradingView) {
+          // @ts-ignore
+          new window.TradingView.widget({
+            symbol,
+            interval: "D",
+            timezone: "America/Sao_Paulo",
+            theme: "dark",
+            style: "1",
+            locale: "br",
+            hide_legend: false,
+            enable_publishing: false,
+            allow_symbol_change: false,
+            container_id: frameId,
+            autosize: true,
+            withdateranges: true,
+            hide_side_toolbar: false,
+          });
+          clearTimeout(timerFallback);
+        } else {
+          setUseIframe(true);
+        }
+      } catch {
+        setUseIframe(true);
+      }
+    };
+    s.onerror = () => setUseIframe(true);
+
+    const w = document.createElement("div");
+    w.id = frameId;
+    w.style.width = "100%";
+    w.style.minHeight = height + "px";
+    containerRef.current.appendChild(w);
+    containerRef.current.appendChild(s);
+
+    return () => { clearTimeout(timerFallback); };
+  }, [symbol, frameId, height]);
+
+  if (useIframe) {
+    // Fallback estável (mostra sempre)
+    const url = new URL("https://s.tradingview.com/widgetembed/");
+    url.search = new URLSearchParams({
       symbol,
       interval: "D",
-      timezone: "America/Sao_Paulo",
+      toolbarbg: "rgba(0,0,0,0)",
+      hidetoptoolbar: "0",
+      hide_legend: "0",
       theme: "dark",
       style: "1",
+      timezone: "America/Sao_Paulo",
       locale: "br",
-      withdateranges: true,
-      allow_symbol_change: false,
-      hide_side_toolbar: false,
-      hide_top_toolbar: false,
-      save_image: false,
-      studies: ["Volume@tv-basicstudies"],
-      range: "12M",
-    });
-    el.appendChild(s);
+      enable_publishing: "false",
+      withdateranges: "true",
+      hide_side_toolbar: "false",
+    }).toString();
 
-    const timeout = window.setTimeout(() => {
-      if (widget.childNodes.length === 0) setFailed(true);
-    }, 2500);
-
-    return () => {
-      window.clearTimeout(timeout);
-      el.innerHTML = "";
-    };
-  }, [symbol]);
-
-  if (failed) {
-    const q = encodeURIComponent(symbol);
-    const src = `https://s.tradingview.com/widgetembed/?symbol=${q}&interval=D&hidesidetoolbar=0&symboledit=0&saveimage=0&studies=%5B%22Volume%40tv-basicstudies%22%5D&theme=dark&style=1&locale=br&withdateranges=1&range=12M`;
     return (
-      <div className="rounded-2xl overflow-hidden bg-white/5 border border-white/10">
+      <div className="rounded-xl overflow-hidden border border-white/10 bg-white/5" style={{ minHeight: height }}>
         <iframe
-          title={"tv-"+symbol}
-          src={src}
+          title={"Chart " + symbol}
+          src={url.toString()}
           style={{ width: "100%", height }}
           frameBorder="0"
           allowTransparency
+          allowFullScreen
         />
       </div>
     );
   }
 
-  return (
-    <div
-      ref={ref}
-      style={{ height }}
-      className="tradingview-widget-container rounded-2xl overflow-hidden bg-white/5 border border-white/10"
-    />
-  );
+  return <div ref={containerRef} className="rounded-xl overflow-hidden border border-white/10" style={{ minHeight: height }} />;
 }

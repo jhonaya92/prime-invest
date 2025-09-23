@@ -17,7 +17,9 @@ export default function Page() {
         <div className="lg:col-span-2">
           <div className="glass rounded-2xl p-6 mb-4">
             <h1 className="text-2xl md:text-3xl font-bold">Destaques do dia</h1>
-            <p className="text-gray-400 text-sm">Altas e quedas com carregamento suave.</p>
+            <p className="text-gray-400 text-sm">
+              Altas e quedas com carregamento suave.
+            </p>
           </div>
           <Highlights />
         </div>
