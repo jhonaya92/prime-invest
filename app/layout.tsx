@@ -2,7 +2,7 @@
 import "./globals.css";
 import NewsToasts from "@/components/NewsToasts";
 import Header from "@/components/Header";
-import TickerTape from "@/components/TickerTape";
+import QuoteBar from "@/components/QuoteBar";
 
 export const metadata: Metadata = {
   title: "Prime Invest • Demo",
@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <NewsToasts />
         <Header />
         <div className="mx-auto max-w-7xl px-4 md:px-6">
-          <TickerTape />
+          <QuoteBar />
           {children}
           <footer className="text-xs text-gray-400 mt-10 mb-6 text-center">
             {new Date().getFullYear()} Prime Invest • Demo visual
