@@ -9,7 +9,11 @@ export const metadata: Metadata = {
   description: "Prévia visual do Prime Invest com charts e toasts.",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <html lang="pt-br">
       <body>
