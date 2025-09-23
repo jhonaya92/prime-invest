@@ -2,7 +2,9 @@
 import { useEffect, useRef } from "react";
 
 declare global {
-  interface Window { TradingView?: any }
+  interface Window {
+    TradingView?: any;
+  }
 }
 
 type Props = { symbol: string; height?: number };
@@ -21,7 +23,11 @@ export default function TradingViewPro({ symbol, height = 420 }: Props) {
     const inject = () => {
       if (!window.TradingView) return;
       // limpa instância anterior
-      try { (hostRef.current as HTMLDivElement).querySelectorAll("iframe").forEach(n=>n.remove()); } catch {}
+      try {
+        (hostRef.current as HTMLDivElement)
+          .querySelectorAll("iframe")
+          .forEach((n) => n.remove());
+      } catch {}
       new window.TradingView.widget({
         container_id: id,
         symbol,
@@ -44,8 +50,14 @@ export default function TradingViewPro({ symbol, height = 420 }: Props) {
     } else if (!loadedRef.current) {
       const s = document.createElement("script");
       s.src = "https://s3.tradingview.com/tv.js";
-      s.onload = () => { loadedRef.current = true; inject(); };
-      s.onerror = () => { hostRef.current!.innerHTML = "<div class='text-sm text-gray-400 p-4'>Falha ao carregar gráfico.</div>"; };
+      s.onload = () => {
+        loadedRef.current = true;
+        inject();
+      };
+      s.onerror = () => {
+        hostRef.current!.innerHTML =
+          "<div class='text-sm text-gray-400 p-4'>Falha ao carregar gráfico.</div>";
+      };
       document.body.appendChild(s);
     } else {
       // script já pedido, tenta de novo em seguida
@@ -53,10 +65,15 @@ export default function TradingViewPro({ symbol, height = 420 }: Props) {
       return () => clearTimeout(t);
     }
 
-    return () => { if (hostRef.current) hostRef.current.innerHTML = ""; };
+    return () => {
+      if (hostRef.current) hostRef.current.innerHTML = "";
+    };
   }, [symbol, height]);
 
   return (
-    <div ref={hostRef} className="rounded-xl overflow-hidden border border-white/10 bg-[#101418]" />
+    <div
+      ref={hostRef}
+      className="rounded-xl overflow-hidden border border-white/10 bg-[#101418]"
+    />
   );
 }

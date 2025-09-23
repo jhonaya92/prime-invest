@@ -110,3 +110,9 @@ body {
 .animate-in {
   animation: fadeIn 0.35s ease-out both;
 }
+.card { border-radius: 1rem; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.05); padding: 1rem; }
+.btn.soft { border-radius: .75rem; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.06); padding: .4rem .8rem; transition: .2s; }
+.btn.soft:hover { background: rgba(255,255,255,.12); }
+.btn.primary { border-radius: .75rem; background: #facc15; color:#111; font-weight:600; padding:.5rem .9rem; }
+.badge { border-radius: .5rem; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.08); padding:.15rem .5rem; font-size:.75rem; color:#e5e7eb; }
+.chip { border-radius: .75rem; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.06); padding:.35rem .75rem; font-size:.9rem; }
