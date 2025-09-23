@@ -1,6 +1,5 @@
 ﻿"use client";
 import { useEffect, useState } from "react";
-
 type Row = { sym: string; price?: number; change?: number };
 
 const DEFAULTS: Row[] = [
@@ -14,36 +13,17 @@ const DEFAULTS: Row[] = [
 
 export default function QuoteChips() {
   const [rows, setRows] = useState<Row[]>(DEFAULTS);
-
-  // opcional: puxar dados reais do seu /api/quote/[symbol]
-  useEffect(() => {
-    // deixe assim por enquanto (demo estável)
-  }, []);
-
+  useEffect(()=>{ /* pode ligar no /api/quote depois; demo fica estável */ },[]);
   return (
     <div className="flex flex-wrap gap-3">
-      {rows.map((r, i) => {
+      {rows.map((r,i)=>{
         const code = (r.sym ?? "").split(":").pop() || "—";
-        const cls =
-          r.change === undefined
-            ? "text-gray-300"
-            : r.change >= 0
-              ? "text-green-400"
-              : "text-red-400";
+        const cls = r.change===undefined?"text-gray-300":r.change>=0?"text-green-400":"text-red-400";
         return (
-          <span
-            key={i}
-            className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2"
-          >
+          <span key={i} className="px-3 py-2 rounded-xl bg-white/5 border border-white/10 flex items-center gap-2">
             <strong>{code}</strong>
-            <span className="text-gray-300">
-              {r.price !== undefined ? `R$ ${r.price.toFixed(2)}` : "— —"}
-            </span>
-            <span className={cls}>
-              {r.change !== undefined
-                ? `${r.change > 0 ? "+" : ""}${r.change.toFixed(2)}%`
-                : "— —"}
-            </span>
+            <span className="text-gray-300">{r.price!==undefined?`R$ ${r.price.toFixed(2)}`:"— —"}</span>
+            <span className={cls}>{r.change!==undefined?`${r.change>0?"+":""}${r.change.toFixed(2)}%`:"— —"}</span>
           </span>
         );
       })}

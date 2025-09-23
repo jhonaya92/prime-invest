@@ -3,20 +3,13 @@ import { useState } from "react";
 import MostSearched from "@/components/MostSearched";
 import TradingViewPro from "@/components/TradingViewPro";
 
-const HOTS = [
-  "BMFBOVESPA:PETR4",
-  "BMFBOVESPA:VALE3",
-  "BMFBOVESPA:ITUB4",
-  "BMFBOVESPA:BBDC4",
-  "BMFBOVESPA:PRIO3",
-];
+const HOTS = ["BMFBOVESPA:PETR4","BMFBOVESPA:VALE3","BMFBOVESPA:ITUB4","BMFBOVESPA:BBDC4","BMFBOVESPA:PRIO3"];
 
 export default function Page() {
   const [sym, setSym] = useState(HOTS[0]);
-
   return (
     <main className="space-y-4">
-      <section className="card">
+      <section className="card animate-in">
         <h1 className="text-3xl font-extrabold">Destaques do dia</h1>
         <p className="text-gray-400 text-sm">Altas e quedas com carregamento suave.</p>
       </section>
@@ -32,21 +25,15 @@ export default function Page() {
             <li className="flex justify-between"><strong>VALE3</strong><span className="text-gray-300">R$ 68,10</span><span className="text-green-400">+1,42%</span></li>
           </ul>
         </div>
-        <div className="card">
-          <MostSearched />
-        </div>
+        <MostSearched />
       </section>
 
       <section className="card">
         <div className="flex items-center justify-between mb-3">
           <div className="text-sm text-gray-300">Gráfico (B3)</div>
           <div className="flex flex-wrap gap-2">
-            {HOTS.map((s) => (
-              <button
-                key={s}
-                onClick={() => setSym(s)}
-                className={`chip ${sym === s ? "ring-1 ring-white/30" : ""}`}
-              >
+            {HOTS.map((s)=>(
+              <button key={s} onClick={()=>setSym(s)} className={`chip ${sym===s?"ring-1 ring-white/30":""}`}>
                 {s.split(":").pop()}
               </button>
             ))}

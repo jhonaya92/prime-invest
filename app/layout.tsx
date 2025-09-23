@@ -5,7 +5,7 @@ import QuoteChips from "@/components/QuoteChips";
 
 export const metadata: Metadata = {
   title: "Prime Invest Demo v2",
-  description: "Demo visual com cotações, destaques e gráfico.",
+  description: "Demo visual com cotações, destaques, análise e gráfico.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
